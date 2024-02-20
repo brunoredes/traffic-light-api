@@ -1,7 +1,7 @@
+import 'dotenv/config';
 import express from 'express';
 import sse from 'better-sse';
 const app = express();
-const PORT = 3000;
 
 /**
  *
@@ -65,4 +65,4 @@ const handleSSE = async (request, response) => {
 
 app.get('/sse', handleSSE);
 
-app.listen(PORT || 3000);
+app.listen(process.env.PORT || 3000);
