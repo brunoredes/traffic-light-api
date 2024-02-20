@@ -2,7 +2,13 @@ import express from 'express';
 import sse from 'better-sse';
 const app = express();
 const PORT = 3000;
-const TIME_IN_MILLISECONDS = (time) => (time * 1000);
+
+/**
+ *
+ * @param {number} time
+ * @returns
+ */
+const TIME_IN_MILLISECONDS = (time) => time * 1000;
 
 /**
  * @typedef {Object} TrafficLight
@@ -11,54 +17,51 @@ const TIME_IN_MILLISECONDS = (time) => (time * 1000);
  */
 
 /**
- * 
- * @param {TrafficLight} currentColor 
- * @returns 
+ *
+ * @param {string} currentColor
+ * @returns {string}
  */
-const toggleTrafficLightColor = ({color: currentColor}) => {
-    return currentColor === 'GREEN' ? 'RED' : 'GREEN';
+const toggleTrafficLightColor = (currentColor) => {
+  return currentColor === 'GREEN' ? 'RED' : 'GREEN';
 };
 
 const colorsMap = new Map([
-    ['RED', { time: 20 }],
-    ['GREEN', { time: 40 }]
+  ['RED', { time: 20 }],
+  ['GREEN', { time: 40 }],
 ]);
 
 /**
  * Function to push a message to the session
- * @param {Object} session 
- * @param {string} color 
+ * @param {Object} session
+ * @param {string} color
  */
 const pushMessage = (session, color) => {
-    session.push(color, 'trafficLightCurrentColor');
+  session.push(color, 'trafficLightCurrentColor');
 };
 
 /**
  * Function to handle SSE requests
- * @param {Object} request 
- * @param {Object} response 
+ * @param {import('express').Request} request
+ * @param {import('express').Response} response
  */
 const handleSSE = async (request, response) => {
-    const { createSession } = sse;
-    const session = await createSession(request, response);
-    let currentColor = 'GREEN';
+  const { createSession } = sse;
+  const session = await createSession(request, response);
+  let currentColor = 'GREEN';
 
-    // Push the initial traffic light color to the client
+  pushMessage(session, currentColor);
+
+  const interval = setInterval(() => {
+    currentColor = toggleTrafficLightColor(currentColor);
+
     pushMessage(session, currentColor);
+  }, TIME_IN_MILLISECONDS(colorsMap.get(currentColor).time));
 
-    // Start the interval to switch between green and red colors
-    const interval = setInterval(() => {
-        // Toggle the traffic light color
-        currentColor = toggleTrafficLightColor(currentColor);
-        
-        // Push the new color to the client
-        pushMessage(session, currentColor);
-    }, TIME_IN_MILLISECONDS(colorsMap.get(currentColor).time));
-
-    // Optionally, clear the interval when the client disconnects
-    request.on('close', () => clearInterval(interval));
+  request.on('close', () => {
+    console.log('fechou');
+    clearInterval(interval);
+  });
 };
-
 
 app.get('/sse', handleSSE);
 
