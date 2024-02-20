@@ -1,7 +1,9 @@
 {
   "name": "traffic-light-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Api that simulates a traffic light",
+  "private": "true",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,5 +14,6 @@
   "dependencies": {
     "express": "^4.18.2",
     "sse": "^0.0.8"
-  }
+  },
+  "repository": {"url": "https://github.com/brunoredes/traffic-light-api"}
 }
