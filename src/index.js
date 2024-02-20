@@ -20,8 +20,8 @@ const toggleTrafficLightColor = ({color: currentColor}) => {
 };
 
 const colorsMap = new Map([
-    ['RED', { time: 2 }],
-    ['GREEN', { time: 6 }]
+    ['RED', { time: 20 }],
+    ['GREEN', { time: 40 }]
 ]);
 
 /**
